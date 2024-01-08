@@ -10,9 +10,7 @@ public class Game {
     char[] box = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
     boolean isBoxEmpty = false;
 
-    //No comments
-    //Incorrect comments
-    //All logic in one method
+
     public void results() {
         Scanner scan = new Scanner(System.in);
 
@@ -39,12 +37,18 @@ public class Game {
                     System.out.println("Invalid input. Enter again.");
             }
 
-            if((box[0]=='X' && box[1]=='X' && box[2]=='X') || (box[3]=='X' && box[4]=='X' && box[5]=='X') || (box[6]=='X' && box[7]=='X' && box[8]=='X') ||
-                    (box[0]=='X' && box[3]=='X' && box[6]=='X') || (box[1]=='X' && box[4]=='X' && box[7]=='X') || (box[2]=='X' && box[5]=='X' && box[8]=='X') ||
-                    (box[0]=='X' && box[4]=='X' && box[8]=='X') || (box[2]=='X' && box[4]=='X' && box[6]=='X')){
+            if (isWinningCombo(box, 0, 1, 2, 'X') ||
+                    isWinningCombo(box, 3, 4, 5, 'X') ||
+                    isWinningCombo(box, 6, 7, 8, 'X') ||
+                    isWinningCombo(box, 0, 3, 6, 'X') ||
+                    isWinningCombo(box, 1, 4, 7, 'X') ||
+                    isWinningCombo(box, 2, 5, 8, 'X') ||
+                    isWinningCombo(box, 0, 4, 8, 'X') ||
+                    isWinningCombo(box, 2, 4, 6, 'X')) {
                 winner = 1;
                 continue;
             }
+
 
             isBoxAvailable = false;
             for(i=0; i<9; i++){
@@ -67,13 +71,23 @@ public class Game {
                 }
             }
 
-            if((box[0]=='O' && box[1]=='O' && box[2]=='O') || (box[3]=='O' && box[4]=='O' && box[5]=='O') || (box[6]=='O' && box[7]=='O' && box[8]=='O') ||
-                    (box[0]=='O' && box[3]=='O' && box[6]=='O') || (box[1]=='O' && box[4]=='O' && box[7]=='O') || (box[2]=='O' && box[5]=='O' && box[8]=='O') ||
-                    (box[0]=='O' && box[4]=='O' && box[8]=='O') || (box[2]=='O' && box[4]=='O' && box[6]=='O')){
+            if (isWinningCombo(box, 0, 1, 2, 'O') ||
+                    isWinningCombo(box, 3, 4, 5, 'O') ||
+                    isWinningCombo(box, 6, 7, 8, 'O') ||
+                    isWinningCombo(box, 0, 3, 6, 'O') ||
+                    isWinningCombo(box, 1, 4, 7, 'O') ||
+                    isWinningCombo(box, 2, 5, 8, 'O') ||
+                    isWinningCombo(box, 0, 4, 8, 'O') ||
+                    isWinningCombo(box, 2, 4, 6, 'O')) {
                 winner = 2;
             }
         }
+        scan.close();
     }
+    private boolean isWinningCombo(char[] board, int a, int b, int c, char player) {
+        return board[a] == player && board[b] == player && board[c] == player;
+    }
+
     private void printBox(){
         System.out.println("\n\n " + box[0] + " | " + box[1] + " | " + box[2] + " ");
         System.out.println("-----------");
