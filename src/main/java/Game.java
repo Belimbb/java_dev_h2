@@ -1,116 +1,144 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
-    byte input;
-    byte rand;
-    byte i;
-    boolean isBoxAvailable;
-    boolean isGameActive;
-    byte winner = 0;
-    char[] box = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
-    boolean isBoxEmpty = false;
+    private boolean isGameActive;
+    private byte winner = 0;
+    private char[] box = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+    private boolean isBoxEmpty = false;
 
 
-    public void results() {
-        Scanner scan = new Scanner(System.in);
-
-        System.out.println("Enter box number to select. Enjoy!\n");
-
-        isGameActive = true;
+    public void startGame() {
+        initializeGame();
         while (isGameActive) {
-
-            printBox();
-
-            isGameActive = whoIsWinner(winner);
-
-            while (true) {
-                input = scan.nextByte();
-                if (input > 0 && input < 10) {
-                    if (box[input - 1] == 'X' || box[input - 1] == 'O')
-                        System.out.println("That one is already in use. Enter another.");
-                    else {
-                        box[input - 1] = 'X';
-                        break;
-                    }
-                }
-                else
-                    System.out.println("Invalid input. Enter again.");
-            }
-
-            if (isWinningCombo(box, 0, 1, 2, 'X') ||
-                    isWinningCombo(box, 3, 4, 5, 'X') ||
-                    isWinningCombo(box, 6, 7, 8, 'X') ||
-                    isWinningCombo(box, 0, 3, 6, 'X') ||
-                    isWinningCombo(box, 1, 4, 7, 'X') ||
-                    isWinningCombo(box, 2, 5, 8, 'X') ||
-                    isWinningCombo(box, 0, 4, 8, 'X') ||
-                    isWinningCombo(box, 2, 4, 6, 'X')) {
+            playerTurn();
+            if (checkForWinner('X')) {
                 winner = 1;
-                continue;
+                break;
             }
-
-
-            isBoxAvailable = false;
-            for(i=0; i<9; i++){
-                if(box[i] != 'X' && box[i] != 'O'){
-                    isBoxAvailable = true;
-                    break;
-                }
-            }
-
-            if(!isBoxAvailable){
+            if (isDraw()) {
                 winner = 3;
-                continue;
+                break;
             }
-
-            while (true) {
-                rand = (byte) (Math.random() * (9 - 1 + 1) + 1);
-                if (box[rand - 1] != 'X' && box[rand - 1] != 'O') {
-                    box[rand - 1] = 'O';
-                    break;
-                }
-            }
-
-            if (isWinningCombo(box, 0, 1, 2, 'O') ||
-                    isWinningCombo(box, 3, 4, 5, 'O') ||
-                    isWinningCombo(box, 6, 7, 8, 'O') ||
-                    isWinningCombo(box, 0, 3, 6, 'O') ||
-                    isWinningCombo(box, 1, 4, 7, 'O') ||
-                    isWinningCombo(box, 2, 5, 8, 'O') ||
-                    isWinningCombo(box, 0, 4, 8, 'O') ||
-                    isWinningCombo(box, 2, 4, 6, 'O')) {
+            computerTurn();
+            if (checkForWinner('O')) {
                 winner = 2;
+                break;
             }
         }
-        scan.close();
-    }
-    private boolean isWinningCombo(char[] board, int a, int b, int c, char player) {
-        return board[a] == player && board[b] == player && board[c] == player;
+        printResult();
     }
 
+    private void initializeGame() {
+        isGameActive = true;
+        winner = 0;
+        isBoxEmpty = false;
+        box = new char[]{'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
+        System.out.println("Welcome to Tic-Tac-Toe!");
+        System.out.println("You are 'X' and the computer is 'O'.");
+        System.out.println("Enter a number from 1 to 9 to choose a box.");
+        printBox();  //Displaying the playing field
+    }
+
+
+    private void playerTurn() {
+        Scanner scanner = new Scanner(System.in);
+        boolean validInput = false;
+
+        System.out.println("Your turn. Enter a number from 1 to 9:");
+
+        while (!validInput) {
+            int input = scanner.nextInt();
+
+            //Check if the entered number is in the range from 1 to 9
+            if (input > 0 && input <= 9) {
+                //Check if the cell is already occupied
+                if (box[input - 1] != 'X' && box[input - 1] != 'O') {
+                    box[input - 1] = 'X';
+                    validInput = true;
+                } else {
+                    System.out.println("This box is already taken. Choose another one.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number from 1 to 9.");
+            }
+        }
+    }
+
+    private void computerTurn() {
+        Random random = new Random();
+        boolean validTurn = false;
+
+        System.out.println("Computer's turn.");
+
+        while (!validTurn) {
+            int choice = random.nextInt(9);
+
+            //Check if the cell is free
+            if (box[choice] != 'X' && box[choice] != 'O') {
+                box[choice] = 'O';
+                validTurn = true;
+            }
+        }
+        printBox();
+    }
+
+    private boolean checkForWinner(char player) {
+        //Checking horizontals
+        for (int i = 0; i < 9; i += 3) {
+            if (box[i] == player && box[i + 1] == player && box[i + 2] == player) {
+                return true;
+            }
+        }
+
+        //Checking verticals
+        for (int i = 0; i < 3; i++) {
+            if (box[i] == player && box[i + 3] == player && box[i + 6] == player) {
+                return true;
+            }
+        }
+
+        //Checking the diagonals
+        if (box[0] == player && box[4] == player && box[8] == player) {
+            return true;
+        }
+        return box[2] == player && box[4] == player && box[6] == player;
+    }
+
+    private boolean isDraw() {
+        //If there is at least one free cell, the game is not over yet
+        for (char c : box) {
+            if (c != 'X' && c != 'O') {
+                return false;
+            }
+        }
+
+        return true;
+    }
     private void printBox(){
+        //Displaying the playing field
         System.out.println("\n\n " + box[0] + " | " + box[1] + " | " + box[2] + " ");
         System.out.println("-----------");
         System.out.println(" " + box[3] + " | " + box[4] + " | " + box[5] + " ");
         System.out.println("-----------");
         System.out.println(" " + box[6] + " | " + box[7] + " | " + box[8] + " \n");
         if(!isBoxEmpty){
+            byte i;
             for(i = 0; i < 9; i++)
                 box[i] = ' ';
             isBoxEmpty = true;
         }
     }
-    private boolean whoIsWinner(byte winner){
-        if(winner == 1){
+    private void printResult() {
+        //Print the result of the game
+        printBox();
+        if (winner == 1) {
             System.out.println("You won the game!\nCreated by Shreyas Saha. Thanks for playing!");
-            return false;
-        } else if(winner == 2){
+        } else if (winner == 2) {
             System.out.println("You lost the game!\nCreated by Shreyas Saha. Thanks for playing!");
-            return false;
-        } else if(winner == 3){
+        } else if (winner == 3) {
             System.out.println("It's a draw!\nCreated by Shreyas Saha. Thanks for playing!");
-            return false;
         }
-        return true;
     }
 }
